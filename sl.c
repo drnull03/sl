@@ -38,6 +38,7 @@
 /* sl version 1.00 : SL runs vomiting out smoke.                             */
 /*                                              by Toyoda Masashi 1992/12/11 */
 
+#include<stdlib.h>
 #include <curses.h>
 #include <signal.h>
 #include <unistd.h>
@@ -50,6 +51,7 @@ int add_D51(int x);
 int add_sl(int x);
 void option(char *str);
 int my_mvaddstr(int y, int x, char *str);
+void exitSL();
 
 int ACCIDENT  = 0;
 int LOGO      = 0;
@@ -90,7 +92,7 @@ int main(int argc, char *argv[])
         }
     }
     initscr();
-    signal(SIGINT, SIG_IGN);
+    signal(SIGINT, exitSL);
     noecho();
     curs_set(0);
     nodelay(stdscr, TRUE);
@@ -292,4 +294,9 @@ void add_smoke(int y, int x)
         S[sum].ptrn = 0; S[sum].kind = sum % 2;
         sum ++;
     }
+}
+
+
+void exitSL(){
+	exit(0);
 }
