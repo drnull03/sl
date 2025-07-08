@@ -298,5 +298,10 @@ void add_smoke(int y, int x)
 
 
 void exitSL(){
+	//terminal clean up
+	mvcur(0, COLS - 1, LINES - 1, 0);
+    endwin();
+
+	//exit the the program with no error code
 	exit(0);
 }
