@@ -6,6 +6,10 @@
  *        Last Modified: 2014/06/03
  *========================================
  */
+/* sl version 5.05 : Added a choo-choo train sound                           */
+/*                                              by Diaa Hanna     2025/08/23 */
+/* sl version 5.04 : Added a SIGINT handler to prevent overwhelming the user.*/
+/*                                              by Diaa Hanna     2025/07/13 */
 /* sl version 5.03 : Fix some more compiler warnings.                        */
 /*                                              by Ryan Jacobs    2015/01/19 */
 /* sl version 5.02 : Fix compiler warnings.                                  */
@@ -38,11 +42,16 @@
 /* sl version 1.00 : SL runs vomiting out smoke.                             */
 /*                                              by Toyoda Masashi 1992/12/11 */
 
-#include<stdlib.h>
+#include <stdlib.h>
 #include <curses.h>
 #include <signal.h>
 #include <unistd.h>
+#include <termios.h>
+#include <sys/wait.h>
 #include "sl.h"
+
+
+struct termios orig_termios;
 
 void add_smoke(int y, int x);
 void add_man(int y, int x);
@@ -52,6 +61,19 @@ int add_sl(int x);
 void option(char *str);
 int my_mvaddstr(int y, int x, char *str);
 void exitSL();
+
+
+
+void playChooChoo() {
+    pid_t pid = fork();
+    if (pid == 0) {
+        execlp("ffplay", "ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", "./assets/choo-choo.mp3", NULL);
+        perror("execlp failed");
+        exit(1);
+    }
+}
+
+
 
 int ACCIDENT  = 0;
 int LOGO      = 0;
@@ -91,6 +113,7 @@ int main(int argc, char *argv[])
             option(argv[i] + 1);
         }
     }
+
     initscr();
     signal(SIGINT, exitSL);
     noecho();
@@ -98,6 +121,11 @@ int main(int argc, char *argv[])
     nodelay(stdscr, TRUE);
     leaveok(stdscr, TRUE);
     scrollok(stdscr, FALSE);
+
+    int ret = system("stty -ixon");
+    if (ret == -1) {
+    perror("system failed");
+    }
 
     for (x = COLS - 1; ; --x) {
         if (LOGO == 1) {
@@ -109,10 +137,16 @@ int main(int argc, char *argv[])
         else {
             if (add_D51(x) == ERR) break;
         }
-        getch();
+
+        int ch = getch();
+        if (ch == 19) {   
+            playChooChoo();
+        }
+
         refresh();
         usleep(40000);
     }
+
     mvcur(0, COLS - 1, LINES - 1, 0);
     endwin();
 
