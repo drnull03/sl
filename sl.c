@@ -67,7 +67,7 @@ void exitSL();
 void playChooChoo() {
     pid_t pid = fork();
     if (pid == 0) {
-        execlp("ffplay", "ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", "./assets/choo-choo.mp3", NULL);
+        execlp("ffplay", "ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", "/usr/games/assets/choo-choo.mp3", NULL);
         perror("execlp failed");
         exit(1);
     }
